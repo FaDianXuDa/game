@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学能力养成游戏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .btn {
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .stat-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div id="startModal" class="modal active">
+        <div class="glass rounded-2xl p-8 max-w-2xl w-full mx-4">
+            <h1 class="text-4xl font-bold text-center mb-8">数学能力养成游戏</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4">知识点分配 (共30点)</h2>
+                    <div id="knowledgePoints" class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="numberTheory" class="font-medium">数论</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('numberTheory', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="numberTheory" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('numberTheory', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="algebra" class="font-medium">代数</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('algebra', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="algebra" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('algebra', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="geometry" class="font-medium">几何</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('geometry', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="geometry" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('geometry', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="operation" class="font-medium">操作</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('operation', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="operation" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('operation', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="reasoning" class="font-medium">推理</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('reasoning', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="reasoning" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('reasoning', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="counting" class="font-medium">计数</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustKnowledge('counting', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="counting" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('counting', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center mt-4" id="knowledgeTotal">剩余: 0</p>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4">天赋点分配 (共15点)</h2>
+                    <div id="talentPoints" class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="carefulness" class="font-medium">细心</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustTalent('carefulness', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="carefulness" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('carefulness', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="mentality" class="font-medium">心态</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustTalent('mentality', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="mentality" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('mentality', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="speed" class="font-medium">手速</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustTalent('speed', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="speed" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('speed', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="creativity" class="font-medium">创造力</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustTalent('creativity', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="creativity" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('creativity', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="thinking" class="font-medium">思维</label>
+                            <div class="flex items-center gap-2">
+                                <button onclick="adjustTalent('thinking', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="thinking" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('thinking', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center mt-4" id="talentTotal">剩余: 0</p>
+                </div>
+            </div>
+            <button onclick="startGame()" class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-lg btn">开始游戏</button>
+        </div>
+    </div>
+
+    <div id="gameModal" class="modal">
+        <div class="glass rounded-2xl p-8 max-w-6xl w-full mx-4 h-[90vh] flex flex-col">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="glass rounded-xl p-4">
+                    <h3 class="text-xl font-semibold mb-3">知识点</h3>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>数论</span>
+                                <span id="ntValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="ntBar" class="stat-fill bg-blue-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>代数</span>
+                                <span id="algValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="algBar" class="stat-fill bg-green-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>几何</span>
+                                <span id="geoValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="geoBar" class="stat-fill bg-yellow-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>操作</span>
+                                <span id="opValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="opBar" class="stat-fill bg-red-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>推理</span>
+                                <span id="reaValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="reaBar" class="stat-fill bg-purple-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>计数</span>
+                                <span id="couValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="couBar" class="stat-fill bg-pink-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <h3 class="text-xl font-semibold mb-3">天赋</h3>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>细心</span>
+                                <span id="careValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="careBar" class="stat-fill bg-indigo-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>心态</span>
+                                <span id="menValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="menBar" class="stat-fill bg-teal-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>手速</span>
+                                <span id="speedValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="speedBar" class="stat-fill bg-orange-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>创造力</span>
+                                <span id="creaValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="creaBar" class="stat-fill bg-lime-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>思维</span>
+                                <span id="thinkValue">0</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="thinkBar" class="stat-fill bg-cyan-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <h3 class="text-xl font-semibold mb-3">状态</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span>压力</span>
+                                <span id="pressureValue">0/100</span>
+                            </div>
+                            <div class="stat-bar mt-1">
+                                <div id="pressureBar" class="stat-fill bg-red-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold" id="roundCounter">第 1 回合</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto">
+                <button onclick="showActionModal('train')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="book-open" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">训练</h3>
+                    <p class="text-sm text-center mt-2">选择一个知识点进行针对性训练</p>
+                </button>
+                <button onclick="showActionModal('practice')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="pen-tool" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">刷题</h3>
+                    <p class="text-sm text-center mt-2">全面提升所有知识点</p>
+                </button>
+                <button onclick="showActionModal('rest')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="coffee" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">摸鱼</h3>
+                    <p class="text-sm text-center mt-2">缓解压力，提升心态</p>
+                </button>
+                <button onclick="showActionModal('evil')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="zap" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">邪修</h3>
+                    <p class="text-sm text-center mt-2">快速提升能力，但有风险</p>
+                </button>
+                <button onclick="showActionModal('research')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="flask-conical" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">钻研</h3>
+                    <p class="text-sm text-center mt-2">深入研究一个知识点</p>
+                </button>
+                <button onclick="showActionModal('exercise')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="dumbbell" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">实践</h3>
+                    <p class="text-sm text-center mt-2">提升多项天赋，缓解压力</p>
+                </button>
+                <button onclick="showActionModal('exam')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-3">
+                    <i data-lucide="graduation-cap" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">考试</h3>
+                    <p class="text-sm text-center mt-2">检验你的学习成果</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="actionModal" class="modal">
+        <div class="glass rounded-2xl p-8 max-w-lg w-full mx-4">
+            <h2 id="actionTitle" class="text-3xl font-bold text-center mb-6">行动</h2>
+            <div id="actionContent" class="space-y-6">
+                <!-- 动态内容 -->
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="closeActionModal()" class="flex-1 py-3 rounded-xl bg-gray-500 hover:bg-gray-600 font-bold btn">取消</button>
+                <button id="confirmAction" onclick="confirmAction()" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="glass rounded-2xl p-8 max-w-lg w-full mx-4">
+            <h2 id="resultTitle" class="text-3xl font-bold text-center mb-6">结果</h2>
+            <div id="resultContent" class="space-y-4">
+                <!-- 动态内容 -->
+            </div>
+            <button onclick="closeResultModal()" class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">继续</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let gameState = {
+            knowledge: {
+                numberTheory: 0,
+                algebra: 0,
+                geometry: 0,
+                operation: 0,
+                reasoning: 0,
+                counting: 0
+            },
+            talents: {
+                carefulness: 0,
+                mentality: 0,
+                speed: 0,
+                creativity: 0,
+                thinking: 0
+            },
+            pressure: 0,
+            round: 1,
+            currentAction: null
+        };
+
+        let knowledgePointsRemaining = 30;
+        let talentPointsRemaining = 15;
+
+        function updatePointCounters() {
+            const knowledgeTotal = Object.values({
+                numberTheory: parseInt(document.getElementById('numberTheory').value) || 0,
+                algebra: parseInt(document.getElementById('algebra').value) || 0,
+                geometry: parseInt(document.getElementById('geometry').value) || 0,
+                operation: parseInt(document.getElementById('operation').value) || 0,
+                reasoning: parseInt(document.getElementById('reasoning').value) || 0,
+                counting: parseInt(document.getElementById('counting').value) || 0
+            }).reduce((a, b) => a + b, 0);
+            knowledgePointsRemaining = 30 - knowledgeTotal;
+            document.getElementById('knowledgeTotal').textContent = `剩余: ${knowledgePointsRemaining}`;
+
+            const talentTotal = Object.values({
+                carefulness: parseInt(document.getElementById('carefulness').value) || 0,
+                mentality: parseInt(document.getElementById('mentality').value) || 0,
+                speed: parseInt(document.getElementById('speed').value) || 0,
+                creativity: parseInt(document.getElementById('creativity').value) || 0,
+                thinking: parseInt(document.getElementById('thinking').value) || 0
+            }).reduce((a, b) => a + b, 0);
+            talentPointsRemaining = 15 - talentTotal;
+            document.getElementById('talentTotal').textContent = `剩余: ${talentPointsRemaining}`;
+        }
+
+        function adjustKnowledge(type, delta) {
+            const input = document.getElementById(type);
+            let value = parseInt(input.value) || 0;
+            value = Math.max(0, Math.min(30, value + delta));
+            input.value = value;
+            updatePointCounters();
+        }
+
+        function adjustTalent(type, delta) {
+            const input = document.getElementById(type);
+            let value = parseInt(input.value) || 0;
+            value = Math.max(0, Math.min(15, value + delta));
+            input.value = value;
+            updatePointCounters();
+        }
+
+        function startGame() {
+            if (knowledgePointsRemaining !== 0 || talentPointsRemaining !== 0) {
+                alert('请分配所有点数！');
+                return;
+            }
+
+            gameState.knowledge = {
+                numberTheory: parseInt(document.getElementById('numberTheory').value),
+                algebra: parseInt(document.getElementById('algebra').value),
+                geometry: parseInt(document.getElementById('geometry').value),
+                operation: parseInt(document.getElementById('operation').value),
+                reasoning: parseInt(document.getElementById('reasoning').value),
+                counting: parseInt(document.getElementById('counting').value)
+            };
+
+            gameState.talents = {
+                carefulness: parseInt(document.getElementById('carefulness').value),
+                mentality: parseInt(document.getElementById('mentality').value),
+                speed: parseInt(document.getElementById('speed').value),
+                creativity: parseInt(document.getElementById('creativity').value),
+                thinking: parseInt(document.getElementById('thinking').value)
+            };
+
+            document.getElementById('startModal').classList.remove('active');
+            document.getElementById('gameModal').classList.add('active');
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // 更新知识点
+            document.getElementById('ntValue').textContent = Math.round(gameState.knowledge.numberTheory);
+            document.getElementById('ntBar').style.width = `${Math.min(100, gameState.knowledge.numberTheory)}%`;
+            document.getElementById('algValue').textContent = Math.round(gameState.knowledge.algebra);
+            document.getElementById('algBar').style.width = `${Math.min(100, gameState.knowledge.algebra)}%`;
+            document.getElementById('geoValue').textContent = Math.round(gameState.knowledge.geometry);
+            document.getElementById('geoBar').style.width = `${Math.min(100, gameState.knowledge.geometry)}%`;
+            document.getElementById('opValue').textContent = Math.round(gameState.knowledge.operation);
+            document.getElementById('opBar').style.width = `${Math.min(100, gameState.knowledge.operation)}%`;
+            document.getElementById('reaValue').textContent = Math.round(gameState.knowledge.reasoning);
+            document.getElementById('reaBar').style.width = `${Math.min(100, gameState.knowledge.reasoning)}%`;
+            document.getElementById('couValue').textContent = Math.round(gameState.knowledge.counting);
+            document.getElementById('couBar').style.width = `${Math.min(100, gameState.knowledge.counting)}%`;
+
+            // 更新天赋
+            document.getElementById('careValue').textContent = gameState.talents.carefulness;
+            document.getElementById('careBar').style.width = `${(gameState.talents.carefulness / 20) * 100}%`;
+            document.getElementById('menValue').textContent = gameState.talents.mentality;
+            document.getElementById('menBar').style.width = `${(gameState.talents.mentality / 20) * 100}%`;
+            document.getElementById('speedValue').textContent = gameState.talents.speed;
+            document.getElementById('speedBar').style.width = `${(gameState.talents.speed / 20) * 100}%`;
+            document.getElementById('creaValue').textContent = gameState.talents.creativity;
+            document.getElementById('creaBar').style.width = `${(gameState.talents.creativity / 20) * 100}%`;
+            document.getElementById('thinkValue').textContent = gameState.talents.thinking;
+            document.getElementById('thinkBar').style.width = `${(gameState.talents.thinking / 20) * 100}%`;
+
+            // 更新压力
+            document.getElementById('pressureValue').textContent = `${gameState.pressure}/100`;
+            document.getElementById('pressureBar').style.width = `${gameState.pressure}%`;
+
+            // 更新回合
+            document.getElementById('roundCounter').textContent = `第 ${gameState.round} 回合`;
+        }
+
+        function showActionModal(action) {
+            gameState.currentAction = action;
+            const modal = document.getElementById('actionModal');
+            const title = document.getElementById('actionTitle');
+            const content = document.getElementById('actionContent');
+
+            switch (action) {
+                case 'train':
+                    title.textContent = '训练';
+                    content.innerHTML = `
+                        <div>
+                            <label class="block mb-2 font-medium">选择知识点</label>
+                            <select id="trainKnowledge" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <option value="numberTheory">数论</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="operation">操作</option>
+                                <option value="reasoning">推理</option>
+                                <option value="counting">计数</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-medium">训练强度 (1-10)</label>
+                            <input type="range" id="trainIntensity" min="1" max="10" value="5" class="w-full">
+                            <div class="flex justify-between text-sm">
+                                <span>1</span>
+                                <span id="intensityValue">5</span>
+                                <span>10</span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('trainIntensity').addEventListener('input', (e) => {
+                        document.getElementById('intensityValue').textContent = e.target.value;
+                    });
+                    break;
+                case 'practice':
+                    title.textContent = '刷题';
+                    content.innerHTML = `<p class="text-center">所有知识点提升 ${gameState.talents.thinking}%，思维+1，压力+5</p>`;
+                    break;
+                case 'rest':
+                    title.textContent = '摸鱼';
+                    content.innerHTML = `<p class="text-center">压力 -${gameState.talents.mentality * 3}，心态 +2</p>`;
+                    break;
+                case 'evil':
+                    title.textContent = '邪修';
+                    content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2</p>`;
+                    break;
+                case 'research':
+                    title.textContent = '钻研';
+                    content.innerHTML = `
+                        <div>
+                            <label class="block mb-2 font-medium">选择知识点</label>
+                            <select id="researchKnowledge" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <option value="numberTheory">数论</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="operation">操作</option>
+                                <option value="reasoning">推理</option>
+                                <option value="counting">计数</option>
+                            </select>
+                        </div>
+                        <p class="text-center mt-4">压力 +20，该知识点 +8</p>
+                    `;
+                    break;
+                case 'exercise':
+                    title.textContent = '实践';
+                    content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8</p>`;
+                    break;
+                case 'exam':
+                    title.textContent = '考试';
+                    content.innerHTML = `<p class="text-center">检验你的学习成果！</p>`;
+                    break;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.remove('active');
+        }
+
+        function confirmAction() {
+            let result = '';
+            switch (gameState.currentAction) {
+                case 'train':
+                    const knowledge = document.getElementById('trainKnowledge').value;
+                    const intensity = parseInt(document.getElementById('trainIntensity').value);
+                    const x = gameState.pressure;
+                    const k = gameState.talents.thinking;
+                    const y = gameState.knowledge[knowledge];
+                    const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.01;
+                    const newK = k + (50 - Math.abs(40 - x - intensity * 10)) * 0.1;
+                    gameState.knowledge[knowledge] = Math.min(100, newY);
+                    gameState.talents.thinking = Math.min(20, newK);
+                    gameState.pressure = Math.min(100, x + intensity);
+                    result = `训练完成！<br>
+                             ${getKnowledgeName(knowledge)}: ${Math.round(y)} → ${Math.round(gameState.knowledge[knowledge])}<br>
+                             思维: ${k.toFixed(1)} → ${gameState.talents.thinking.toFixed(1)}<br>
+                             压力: ${x} → ${gameState.pressure}`;
+                    break;
+                case 'practice':
+                    const boost = gameState.talents.thinking / 100;
+                    Object.keys(gameState.knowledge).forEach(key => {
+                        gameState.knowledge[key] = Math.min(100, gameState.knowledge[key] * (1 + boost));
+                    });
+                    gameState.talents.thinking = Math.min(20, gameState.talents.thinking + 1);
+                    gameState.pressure = Math.min(100, gameState.pressure + 5);
+                    result = `刷题完成！<br>
+                             所有知识点提升 ${gameState.talents.thinking - 1}%<br>
+                             思维: ${gameState.talents.thinking - 1} → ${gameState.talents.thinking}<br>
+                             压力: ${gameState.pressure - 5} → ${gameState.pressure}`;
+                    break;
+                case 'rest':
+                    const reduce = gameState.talents.mentality * 3;
+                    gameState.pressure = Math.max(0, gameState.pressure - reduce);
+                    gameState.talents.mentality = Math.min(20, gameState.talents.mentality + 2);
+                    result = `摸鱼愉快！<br>
+                             压力: ${gameState.pressure + reduce} → ${gameState.pressure}<br>
+                             心态: ${gameState.talents.mentality - 2} → ${gameState.talents.mentality}`;
+                    break;
+                case 'evil':
+                    const randomKnowledge = Object.keys(gameState.knowledge)[Math.floor(Math.random() * 6)];
+                    gameState.knowledge[randomKnowledge] = Math.min(100, gameState.knowledge[randomKnowledge] + 7);
+                    gameState.talents.thinking = Math.min(20, gameState.talents.thinking + 5);
+                    gameState.talents.creativity = Math.min(20, gameState.talents.creativity + 2);
+                    result = `邪修完成！<br>
+                             ${getKnowledgeName(randomKnowledge)}: +7<br>
+                             思维: +5<br>
+                             创造力: +2`;
+                    break;
+                case 'research':
+                    const researchKnowledge = document.getElementById('researchKnowledge').value;
+                    gameState.knowledge[researchKnowledge] = Math.min(100, gameState.knowledge[researchKnowledge] + 8);
+                    gameState.pressure = Math.min(100, gameState.pressure + 20);
+                    result = `钻研完成！<br>
+                             ${getKnowledgeName(researchKnowledge)}: +8<br>
+                             压力: ${gameState.pressure - 20} → ${gameState.pressure}`;
+                    break;
+                case 'exercise':
+                    gameState.talents.speed = Math.min(20, gameState.talents.speed + 1);
+                    gameState.talents.carefulness = Math.min(20, gameState.talents.carefulness + 1);
+                    gameState.talents.creativity = Math.min(20, gameState.talents.creativity + 2);
+                    gameState.pressure = Math.max(0, gameState.pressure - 8);
+                    result = `实践完成！<br>
+                             手速: +1<br>
+                             细心: +1<br>
+                             创造力: +2<br>
+                             压力: ${gameState.pressure + 8} → ${gameState.pressure}`;
+                    break;
+                case 'exam':
+                    const a = Math.floor(Math.random() * 9);
+                    const b = Math.floor(Math.random() * 9);
+                    const c = Math.floor(Math.random() * 9);
+                    const d = Math.floor(Math.random() * 9);
+                    const e = Math.floor(Math.random() * 9);
+                    const f = 20 - a - b - c - d - e;
+                    
+                    const baseScore = (100 - gameState.pressure) * (90 + gameState.talents.carefulness) / 100;
+                    const knowledgeScore = a * gameState.knowledge.numberTheory + 
+                                          b * gameState.knowledge.algebra + 
+                                          c * gameState.knowledge.geometry + 
+                                          d * gameState.knowledge.operation + 
+                                          e * gameState.knowledge.reasoning + 
+                                          f * gameState.knowledge.counting;
+                    const finalScore = baseScore * knowledgeScore * gameState.talents.thinking * gameState.talents.creativity * gameState.talents.speed / 1000000;
+                    
+                    result = `考试结果：${Math.round(finalScore)} 分<br><br>
+                             知识点权重：<br>
+                             数论: ${a} | 代数: ${b} | 几何: ${c}<br>
+                             操作: ${d} | 推理: ${e} | 计数: ${f}<br><br>
+                             选择一个知识点提升 20%`;
+                    
+                    // 显示选择界面
+                    setTimeout(() => {
+                        const modal = document.getElementById('resultModal');
+                        const content = document.getElementById('resultContent');
+                        content.innerHTML = `
+                            <p>${result}</p>
+                            <select id="boostKnowledge" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400 mt-4">
+                                <option value="numberTheory">数论</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="operation">操作</option>
+                                <option value="reasoning">推理</option>
+                                <option value="counting">计数</option>
+                            </select>
+                        `;
+                        const button = modal.querySelector('button');
+                        button.textContent = '确认提升';
+                        button.onclick = () => {
+                            const selected = document.getElementById('boostKnowledge').value;
+                            const oldValue = gameState.knowledge[selected];
+                            gameState.knowledge[selected] = Math.min(100, oldValue * 1.2);
+                            gameState.pressure = Math.min(100, gameState.pressure * 1.2);
+                            
+                            content.innerHTML = `<p>提升完成！<br>
+                                                ${getKnowledgeName(selected)}: ${Math.round(oldValue)} → ${Math.round(gameState.knowledge[selected])}<br>
+                                                压力: ${Math.round(gameState.pressure / 1.2)} → ${Math.round(gameState.pressure)}</p>`;
+                            button.textContent = '继续';
+                            button.onclick = closeResultModal;
+                        };
+                    }, 0);
+                    break;
+            }
+
+            if (gameState.currentAction !== 'exam') {
+                showResult(result);
+            }
+            
+            closeActionModal();
+            if (gameState.currentAction !== 'exam') {
+                endRound();
+            }
+        }
+
+        function showResult(message) {
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+            content.innerHTML = `<p>${message}</p>`;
+            modal.classList.add('active');
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.remove('active');
+            endRound();
+        }
+
+        function endRound() {
+            gameState.round++;
+            updateDisplay();
+            
+            // 检查压力是否过高
+            if (gameState.pressure >= 100) {
+                alert('压力过大！游戏结束。');
+                resetGame();
+            }
+        }
+
+        function getKnowledgeName(key) {
+            const names = {
+                numberTheory: '数论',
+                algebra: '代数',
+                geometry: '几何',
+                operation: '操作',
+                reasoning: '推理',
+                counting: '计数'
+            };
+            return names[key];
+        }
+
+        function resetGame() {
+            document.getElementById('gameModal').classList.remove('active');
+            document.getElementById('startModal').classList.add('active');
+            // 重置输入框
+            document.getElementById('numberTheory').value = 5;
+            document.getElementById('algebra').value = 5;
+            document.getElementById('geometry').value = 5;
+            document.getElementById('operation').value = 5;
+            document.getElementById('reasoning').value = 5;
+            document.getElementById('counting').value = 5;
+            document.getElementById('carefulness').value = 3;
+            document.getElementById('mentality').value = 3;
+            document.getElementById('speed').value = 3;
+            document.getElementById('creativity').value = 3;
+            document.getElementById('thinking').value = 3;
+            updatePointCounters();
+            
+            gameState = {
+                knowledge: { numberTheory: 0, algebra: 0, geometry: 0, operation: 0, reasoning: 0, counting: 0 },
+                talents: { carefulness: 0, mentality: 0, speed: 0, creativity: 0, thinking: 0 },
+                pressure: 0,
+                round: 1,
+                currentAction: null
+            };
+        }
+
+        // 初始化
+        updatePointCounters();
+    </script>
+</body>
+</html>
