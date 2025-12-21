@@ -327,7 +327,7 @@
                 </button>
                 <button onclick="showActionModal('exam')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-3">
                     <i data-lucide="graduation-cap" class="w-12 h-12 mb-4"></i>
-                    <h3 class="text-xl font-bold">考试</h3>
+                    <h3 class="text-xl font-bold">测试</h3>
                     <p class="text-sm text-center mt-2">检验你的学习成果</p>
                 </button>
             </div>
@@ -534,7 +534,6 @@
                         </div>
                         <div class="mt-4 text-center text-yellow-300">
                             <p>本次训练压力将增加: ${pressureIncrease}</p>
-                            <p>知识点效果 ÷100 | 思维效果 ÷2 | 消耗 1 回合</p>
                         </div>
                     `;
                     document.getElementById('trainIntensity').addEventListener('input', (e) => {
@@ -576,7 +575,7 @@
                     content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
                 case 'exam':
-                    title.textContent = '考试';
+                    title.textContent = '测试';
                     content.innerHTML = `<p class="text-center">检验你的学习成果！<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
             }
@@ -724,7 +723,7 @@
                     weights.push(20 - total);
                     const [a, b, c, d, e, f] = weights;
                     
-                    result = `考试完成！<br><br>
+                    result = `测试完成！<br><br>
                              知识点权重：<br>
                              数论: ${a} | 代数: ${b} | 几何: ${c}<br>
                              操作: ${d} | 推理: ${e} | 计数: ${f}<br><br>
