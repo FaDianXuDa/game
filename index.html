@@ -635,12 +635,17 @@
                              压力: ${gameState.pressure + 8} → ${gameState.pressure}`;
                     break;
                 case 'exam':
-                    const a = Math.floor(Math.random() * 9);
-                    const b = Math.floor(Math.random() * 9);
-                    const c = Math.floor(Math.random() * 9);
-                    const d = Math.floor(Math.random() * 9);
-                    const e = Math.floor(Math.random() * 9);
-                    const f = 20 - a - b - c - d - e;
+                    // 生成0-8之间的随机权重，确保总和为20且无负数
+                    let weights = [];
+                    let total = 0;
+                    for (let i = 0; i < 5; i++) {
+                        const max = Math.min(8, 20 - total - (4 - i) * 0);
+                        const weight = Math.floor(Math.random() * (max + 1));
+                        weights.push(weight);
+                        total += weight;
+                    }
+                    weights.push(20 - total);
+                    const [a, b, c, d, e, f] = weights;
                     
                     const baseScore = (100 - gameState.pressure) * (90 + gameState.talents.carefulness) / 100;
                     const knowledgeScore = a * gameState.knowledge.numberTheory + 
@@ -658,35 +663,35 @@
                              选择一个知识点提升 20%`;
                     
                     // 显示选择界面
-                    setTimeout(() => {
-                        const modal = document.getElementById('resultModal');
-                        const content = document.getElementById('resultContent');
-                        content.innerHTML = `
-                            <p>${result}</p>
-                            <select id="boostKnowledge" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400 mt-4">
-                                <option value="numberTheory">数论</option>
-                                <option value="algebra">代数</option>
-                                <option value="geometry">几何</option>
-                                <option value="operation">操作</option>
-                                <option value="reasoning">推理</option>
-                                <option value="counting">计数</option>
-                            </select>
-                        `;
-                        const button = modal.querySelector('button');
-                        button.textContent = '确认提升';
-                        button.onclick = () => {
-                            const selected = document.getElementById('boostKnowledge').value;
-                            const oldValue = gameState.knowledge[selected];
-                            gameState.knowledge[selected] = Math.min(100, oldValue * 1.2);
-                            gameState.pressure = Math.min(100, gameState.pressure * 1.2);
-                            
-                            content.innerHTML = `<p>提升完成！<br>
-                                                ${getKnowledgeName(selected)}: ${Math.round(oldValue)} → ${Math.round(gameState.knowledge[selected])}<br>
-                                                压力: ${Math.round(gameState.pressure / 1.2)} → ${Math.round(gameState.pressure)}</p>`;
-                            button.textContent = '继续';
-                            button.onclick = closeResultModal;
-                        };
-                    }, 0);
+                    const modal = document.getElementById('resultModal');
+                    const content = document.getElementById('resultContent');
+                    content.innerHTML = `
+                        <p class="text-2xl font-bold text-center mb-4">${result}</p>
+                        <select id="boostKnowledge" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400 mt-4">
+                            <option value="numberTheory">数论</option>
+                            <option value="algebra">代数</option>
+                            <option value="geometry">几何</option>
+                            <option value="operation">操作</option>
+                            <option value="reasoning">推理</option>
+                            <option value="counting">计数</option>
+                        </select>
+                    `;
+                    const button = modal.querySelector('button');
+                    button.textContent = '确认提升';
+                    button.onclick = () => {
+                        const selected = document.getElementById('boostKnowledge').value;
+                        const oldValue = gameState.knowledge[selected];
+                        gameState.knowledge[selected] = Math.min(100, oldValue * 1.2);
+                        gameState.pressure = Math.min(100, gameState.pressure * 1.2);
+                        
+                        content.innerHTML = `<p>提升完成！<br>
+                                            ${getKnowledgeName(selected)}: ${Math.round(oldValue)} → ${Math.round(gameState.knowledge[selected])}<br>
+                                            压力: ${Math.round(gameState.pressure / 1.2)} → ${Math.round(gameState.pressure)}</p>`;
+                        button.textContent = '继续';
+                        button.onclick = closeResultModal;
+                        updateDisplay(); // 立即更新显示
+                    };
+                    modal.classList.add('active');
                     break;
             }
 
