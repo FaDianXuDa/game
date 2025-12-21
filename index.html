@@ -508,6 +508,8 @@
             switch (action) {
                 case 'train':
                     title.textContent = '训练';
+                    // 计算本次训练的压力增加量
+                    const pressureIncrease = (20 - gameState.talents.mentality) * 3;
                     content.innerHTML = `
                         <div>
                             <label class="block mb-2 font-medium">选择知识点</label>
@@ -529,6 +531,10 @@
                                 <span>10</span>
                             </div>
                         </div>
+                        <div class="mt-4 text-center text-yellow-300">
+                            <p>本次训练压力将增加: ${pressureIncrease}</p>
+                            <p>(心态越好，压力增加越少)</p>
+                        </div>
                     `;
                     document.getElementById('trainIntensity').addEventListener('input', (e) => {
                         document.getElementById('intensityValue').textContent = e.target.value;
@@ -544,7 +550,7 @@
                     break;
                 case 'evil':
                     title.textContent = '邪修';
-                    const failRate = Math.max(0, 100 - 10 * gameState.talents.thinking);
+                    const failRate = Math.max(0, 100 - 3 * gameState.talents.thinking);
                     content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2<br><span class="text-yellow-300">失效概率: ${failRate}%</span></p>`;
                     break;
                 case 'research':
@@ -590,17 +596,25 @@
                     const x = gameState.pressure;
                     const k = gameState.talents.thinking;
                     const y = gameState.knowledge[knowledge];
+                    const mentality = gameState.talents.mentality;
+                    
+                    // 训练核心计算公式
                     const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.01;
                     const newK = k + (50 - Math.abs(40 - x - intensity * 10)) * 0.1;
+                    // 压力增加量改为 (20 - 心态) * 3
+                    const pressureIncrease = (20 - mentality) * 3;
+                    
                     gameState.knowledge[knowledge] = newY;
                     gameState.talents.thinking = newK;
-                    gameState.pressure = x + intensity;
+                    gameState.pressure = x + pressureIncrease;
+                    
                     // 所有数值向上取整
                     ceilAllValues();
+                    
                     result = `训练完成！<br>
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(x)} → ${gameState.pressure}`;
+                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${pressureIncrease})`;
                     break;
                 case 'practice':
                     const boost = gameState.talents.thinking / 100;
@@ -630,8 +644,8 @@
                              心态: ${Math.ceil(oldMentality)} → ${gameState.talents.mentality}`;
                     break;
                 case 'evil':
-                    // 计算失效概率 (100-10*思维)%
-                    const failProbability = Math.max(0, 100 - 10 * gameState.talents.thinking);
+                    // 邪修失效概率改为 (100 - 3*思维)%
+                    const failProbability = Math.max(0, 100 - 3 * gameState.talents.thinking);
                     const isFailed = Math.random() * 100 < failProbability;
                     
                     if (isFailed) {
