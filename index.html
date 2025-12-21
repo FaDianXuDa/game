@@ -289,6 +289,7 @@
                         </div>
                         <div class="text-center">
                             <p class="text-2xl font-bold" id="roundCounter">第 1 回合</p>
+                            <p class="text-sm mt-2">所有操作消耗 1 回合</p>
                         </div>
                     </div>
                 </div>
@@ -533,7 +534,7 @@
                         </div>
                         <div class="mt-4 text-center text-yellow-300">
                             <p>本次训练压力将增加: ${pressureIncrease}</p>
-                            <p>(心态越好，压力增加越少)</p>
+                            <p>训练效果已降至原来的 1/10 | 消耗 1 回合</p>
                         </div>
                     `;
                     document.getElementById('trainIntensity').addEventListener('input', (e) => {
@@ -542,16 +543,16 @@
                     break;
                 case 'practice':
                     title.textContent = '刷题';
-                    content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+5</p>`;
+                    content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+5<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
                 case 'rest':
                     title.textContent = '摸鱼';
-                    content.innerHTML = `<p class="text-center">压力 -${Math.ceil(gameState.talents.mentality * 3)}，心态 +2</p>`;
+                    content.innerHTML = `<p class="text-center">压力 -${Math.ceil(gameState.talents.mentality * 3)}，心态 +2<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
                 case 'evil':
                     title.textContent = '邪修';
                     const failRate = Math.max(0, 100 - 3 * gameState.talents.thinking);
-                    content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2<br><span class="text-yellow-300">失效概率: ${failRate}%</span></p>`;
+                    content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2<br><span class="text-yellow-300">失效概率: ${failRate}% | 消耗 1 回合</span></p>`;
                     break;
                 case 'research':
                     title.textContent = '钻研';
@@ -567,16 +568,16 @@
                                 <option value="counting">计数</option>
                             </select>
                         </div>
-                        <p class="text-center mt-4">压力 +20，该知识点 +8</p>
+                        <p class="text-center mt-4">压力 +20，该知识点 +8<br><span class="text-yellow-300">消耗 1 回合</span></p>
                     `;
                     break;
                 case 'exercise':
                     title.textContent = '实践';
-                    content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8</p>`;
+                    content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
                 case 'exam':
                     title.textContent = '考试';
-                    content.innerHTML = `<p class="text-center">检验你的学习成果！</p>`;
+                    content.innerHTML = `<p class="text-center">检验你的学习成果！<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     break;
             }
 
@@ -598,10 +599,10 @@
                     const y = gameState.knowledge[knowledge];
                     const mentality = gameState.talents.mentality;
                     
-                    // 训练核心计算公式
-                    const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.01;
-                    const newK = k + (50 - Math.abs(40 - x - intensity * 10)) * 0.1;
-                    // 压力增加量改为 (20 - 心态) * 3
+                    // 训练核心计算公式 - 效果降至原来的 1/10
+                    const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.001; // 0.01 → 0.001 (1/10)
+                    const newK = k + (50 - Math.abs(40 - x - intensity * 10)) * 0.01; // 0.1 → 0.01 (1/10)
+                    // 压力增加量保持 (20 - 心态) * 3
                     const pressureIncrease = (20 - mentality) * 3;
                     
                     gameState.knowledge[knowledge] = newY;
@@ -614,7 +615,8 @@
                     result = `训练完成！<br>
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${pressureIncrease})`;
+                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${pressureIncrease})<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'practice':
                     const boost = gameState.talents.thinking / 100;
@@ -629,7 +631,8 @@
                     result = `刷题完成！<br>
                              所有知识点提升 ${Math.ceil(oldThinking)}%<br>
                              思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(gameState.pressure - 5)} → ${gameState.pressure}`;
+                             压力: ${Math.ceil(gameState.pressure - 5)} → ${gameState.pressure}<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'rest':
                     const reduce = gameState.talents.mentality * 3;
@@ -641,17 +644,19 @@
                     ceilAllValues();
                     result = `摸鱼愉快！<br>
                              压力: ${Math.ceil(oldPressure)} → ${gameState.pressure}<br>
-                             心态: ${Math.ceil(oldMentality)} → ${gameState.talents.mentality}`;
+                             心态: ${Math.ceil(oldMentality)} → ${gameState.talents.mentality}<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'evil':
-                    // 邪修失效概率改为 (100 - 3*思维)%
+                    // 邪修失效概率固定为 (100 - 3*思维)%
                     const failProbability = Math.max(0, 100 - 3 * gameState.talents.thinking);
                     const isFailed = Math.random() * 100 < failProbability;
                     
                     if (isFailed) {
                         result = `邪修失败！<br>
                                  本次邪修没有带来任何提升<br>
-                                 失效概率: ${failProbability}%`;
+                                 失效概率: ${failProbability}%<br>
+                                 <span class="text-yellow-300">消耗 1 回合</span>`;
                     } else {
                         const randomKnowledge = Object.keys(gameState.knowledge)[Math.floor(Math.random() * 6)];
                         const oldKnowledge = gameState.knowledge[randomKnowledge];
@@ -667,7 +672,8 @@
                         result = `邪修成功！<br>
                                  ${getKnowledgeName(randomKnowledge)}: ${Math.ceil(oldKnowledge)} → ${gameState.knowledge[randomKnowledge]}<br>
                                  思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
-                                 创造力: ${Math.ceil(oldCreativity)} → ${gameState.talents.creativity}`;
+                                 创造力: ${Math.ceil(oldCreativity)} → ${gameState.talents.creativity}<br>
+                                 <span class="text-yellow-300">消耗 1 回合</span>`;
                     }
                     break;
                 case 'research':
@@ -680,7 +686,8 @@
                     ceilAllValues();
                     result = `钻研完成！<br>
                              ${getKnowledgeName(researchKnowledge)}: ${Math.ceil(oldResearchValue)} → ${gameState.knowledge[researchKnowledge]}<br>
-                             压力: ${Math.ceil(oldResearchPressure)} → ${gameState.pressure}`;
+                             压力: ${Math.ceil(oldResearchPressure)} → ${gameState.pressure}<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'exercise':
                     const oldExercisePressure = gameState.pressure;
@@ -699,7 +706,8 @@
                              手速: ${Math.ceil(oldSpeed)} → ${gameState.talents.speed}<br>
                              细心: ${Math.ceil(oldCare)} → ${gameState.talents.carefulness}<br>
                              创造力: ${Math.ceil(oldCrea)} → ${gameState.talents.creativity}<br>
-                             压力: ${Math.ceil(oldExercisePressure)} → ${gameState.pressure}`;
+                             压力: ${Math.ceil(oldExercisePressure)} → ${gameState.pressure}<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'exam':
                     // 生成0-8之间的随机权重，确保总和为20且无负数
@@ -718,7 +726,8 @@
                              知识点权重：<br>
                              数论: ${a} | 代数: ${b} | 几何: ${c}<br>
                              操作: ${d} | 推理: ${e} | 计数: ${f}<br><br>
-                             选择一个知识点提升 20%`;
+                             选择一个知识点提升 20%<br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     
                     // 显示选择界面
                     const modal = document.getElementById('resultModal');
@@ -748,7 +757,8 @@
                         
                         content.innerHTML = `<p>提升完成！<br>
                                             ${getKnowledgeName(selected)}: ${Math.ceil(oldValue)} → ${gameState.knowledge[selected]}<br>
-                                            压力: ${Math.ceil((oldPressure * 1.2 + 20 - 20) / 1.2)} → ${gameState.pressure}</p>`;
+                                            压力: ${Math.ceil((oldPressure * 1.2 + 20 - 20) / 1.2)} → ${gameState.pressure}<br>
+                                            <span class="text-yellow-300">消耗 1 回合</span></p>`;
                         button.textContent = '继续';
                         button.onclick = closeResultModal;
                         updateDisplay();
@@ -779,6 +789,7 @@
             endRound();
         }
 
+        // 所有操作统一消耗 1 回合
         function endRound() {
             gameState.round++;
             updateDisplay();
