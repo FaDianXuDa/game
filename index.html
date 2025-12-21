@@ -534,7 +534,7 @@
                         </div>
                         <div class="mt-4 text-center text-yellow-300">
                             <p>本次训练压力将增加: ${pressureIncrease}</p>
-                            <p>知识点效果 ÷10 | 思维效果 ÷2 | 消耗 1 回合</p>
+                            <p>知识点效果 ÷100 | 思维效果 ÷2 | 消耗 1 回合</p>
                         </div>
                     `;
                     document.getElementById('trainIntensity').addEventListener('input', (e) => {
@@ -599,10 +599,10 @@
                     const y = gameState.knowledge[knowledge];
                     const mentality = gameState.talents.mentality;
                     
-                    // 训练核心计算公式调整：
-                    // 1. 知识点效果 ÷10 (0.01 → 0.001)
-                    // 2. 思维效果 ÷2 (0.1 → 0.05)
-                    const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.001; 
+                    // 训练核心计算公式最终调整：
+                    // 1. 知识点效果 原0.01 → 0.0001（÷100，即两次÷10）
+                    // 2. 思维效果 原0.1 → 0.05（÷2，保持不变）
+                    const newY = (100 - Math.abs(50 - x)) * intensity * (5 + y / 10) * k * 0.0001; 
                     const newK = k + (50 - Math.abs(40 - x - intensity * 10)) * 0.05; 
                     // 压力增加量保持 (20 - 心态) * 3
                     const pressureIncrease = (20 - mentality) * 3;
@@ -618,7 +618,7 @@
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
                              压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${pressureIncrease})<br>
-                             <span class="text-yellow-300">知识点效果÷10 | 思维效果÷2 | 消耗 1 回合</span>`;
+                             <span class="text-yellow-300">知识点效果÷100 | 思维效果÷2 | 消耗 1 回合</span>`;
                     break;
                 case 'practice':
                     const boost = gameState.talents.thinking / 100;
