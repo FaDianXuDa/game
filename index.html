@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>树穴老邓之死</title>
+    <title>数学能力养成游戏</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
     <style>
@@ -13,8 +13,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        //I'm KBW;
-        //I'm KBW;
         .glass {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
@@ -53,14 +51,41 @@
             align-items: center;
             justify-content: center;
         }
+        /* 压力等级样式 */
+        .pressure-level {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .level-light { background-color: #10b981; color: white; } /* 轻度-绿色 */
+        .level-moderate { background-color: #f59e0b; color: white; } /* 中度-黄色 */
+        .level-severe { background-color: #f97316; color: white; } /* 重度-橙色 */
+        .level-critical { background-color: #ef4444; color: white; } /* 超重度-红色 */
+        /* 剧情弹窗样式 */
+        .story-modal {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #8b5cf6;
+        }
     </style>
 </head>
 <body class="text-white">
-    <div id="startModal" class="modal active">
+    <!-- 新增剧情弹窗 -->
+    <div id="storyModal" class="modal active story-modal">
+        <div class="glass rounded-2xl p-8 max-w-3xl w-full mx-4">
+            <h1 class="text-3xl font-bold text-center mb-6 text-purple-300">前情提要</h1>
+            <p class="text-xl leading-relaxed text-center mb-8">
+                巨浪同志的树穴老邓被滚回了精神病院，导致了巨浪的初中树穴牢尸不见了，需要长达一坤年的自学。<br>
+                而被肘死的巨浪同志也是成功重生了。这一世，他要夺回属于他的一切！
+            </p>
+            <button onclick="closeStoryModal()" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-lg btn">
+                开始我的重生之路
+            </button>
+        </div>
+    </div>
+
+    <div id="startModal" class="modal">
         <div class="glass rounded-2xl p-8 max-w-2xl w-full mx-4">
-            <h1 class="text-4xl font-bold text-center mb-8">树穴老邓之死</h1>
-            <h2 class="text-2xl font-semibold mb-4">&nbsp;&nbsp;&nbsp;&nbsp;巨浪同志的树穴老邓被滚回了精神病院，导致了巨浪的初中树穴牢尸不见了，需要长达一坤年的自学。</h2>
-            <h2 class="text-2xl font-semibold mb-4">&nbsp;&nbsp;&nbsp;&nbsp;而被肘死的巨浪同志也是成功重生了。这一世，他要夺回属于他的一切！</h2>
+            <h1 class="text-4xl font-bold text-center mb-8">数学能力养成游戏</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 class="text-2xl font-semibold mb-4">知识点分配 (共30点)</h2>
@@ -298,7 +323,7 @@
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-grow overflow-y-auto">
                 <button onclick="showActionModal('train')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="book-open" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">训练</h3>
@@ -329,7 +354,12 @@
                     <h3 class="text-xl font-bold">实践</h3>
                     <p class="text-sm text-center mt-2">提升多项天赋，缓解压力</p>
                 </button>
-                <button onclick="showActionModal('exam')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-3">
+                <button onclick="showActionModal('help')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                    <i data-lucide="users" class="w-12 h-12 mb-4"></i>
+                    <h3 class="text-xl font-bold">互助</h3>
+                    <p class="text-sm text-center mt-2">两个知识点取平均值（压力随差值增加）</p>
+                </button>
+                <button onclick="showActionModal('exam')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-4">
                     <i data-lucide="graduation-cap" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">考试</h3>
                     <p class="text-sm text-center mt-2">检验你的学习成果</p>
@@ -343,6 +373,14 @@
             <h2 id="actionTitle" class="text-3xl font-bold text-center mb-6">行动</h2>
             <div id="actionContent" class="space-y-6">
                 <!-- 动态内容 -->
+            </div>
+            <!-- 压力等级预览区域 -->
+            <div id="pressurePreview" class="mt-4 hidden">
+                <p class="font-medium mb-2">操作后压力预览：</p>
+                <div class="flex items-center gap-2">
+                    <span id="previewPressureValue">0/100</span>
+                    <span id="previewPressureLevel" class="pressure-level">轻度</span>
+                </div>
             </div>
             <div class="flex gap-4 mt-8">
                 <button onclick="closeActionModal()" class="flex-1 py-3 rounded-xl bg-gray-500 hover:bg-gray-600 font-bold btn">取消</button>
@@ -388,6 +426,12 @@
         let knowledgePointsRemaining = 30;
         let talentPointsRemaining = 15;
 
+        // 关闭剧情弹窗
+        function closeStoryModal() {
+            document.getElementById('storyModal').classList.remove('active');
+            document.getElementById('startModal').classList.add('active');
+        }
+
         // 向上取整工具函数
         function ceilAllValues() {
             // 知识点向上取整
@@ -400,6 +444,34 @@
             });
             // 压力向上取整
             gameState.pressure = Math.ceil(Math.min(100, Math.max(0, gameState.pressure)));
+        }
+
+        // 获取压力等级信息
+        function getPressureLevel(pressure) {
+            pressure = Math.ceil(pressure);
+            if (pressure <= 50) {
+                return { text: '轻度', class: 'level-light' };
+            } else if (pressure <= 80) {
+                return { text: '中度', class: 'level-moderate' };
+            } else if (pressure < 100) {
+                return { text: '重度', class: 'level-severe' };
+            } else {
+                return { text: '超重度', class: 'level-critical' };
+            }
+        }
+
+        // 更新压力预览
+        function updatePressurePreview(newPressure) {
+            const previewContainer = document.getElementById('pressurePreview');
+            const previewValue = document.getElementById('previewPressureValue');
+            const previewLevel = document.getElementById('previewPressureLevel');
+            
+            const levelInfo = getPressureLevel(newPressure);
+            previewValue.textContent = `${Math.ceil(newPressure)}/100`;
+            previewLevel.textContent = levelInfo.text;
+            previewLevel.className = `pressure-level ${levelInfo.class}`;
+            
+            previewContainer.classList.remove('hidden');
         }
 
         function updatePointCounters() {
@@ -510,10 +582,13 @@
             const title = document.getElementById('actionTitle');
             const content = document.getElementById('actionContent');
 
+            // 重置压力预览
+            document.getElementById('pressurePreview').classList.add('hidden');
+
             switch (action) {
                 case 'train':
                     title.textContent = '训练';
-                    // 实时计算压力增加量（基于当前心态和训练强度）
+                    // 实时计算压力增加量（基于当前心态和训练强度，现在减半）
                     const currentMentality = gameState.talents.mentality;
                     content.innerHTML = `
                         <div>
@@ -536,23 +611,42 @@
                                 <span>10</span>
                             </div>
                         </div>
+                        <div class="mt-4 text-center text-yellow-300">
+                            <p>压力增加量: 强度 × (20 - 当前心态) × 0.5（当前心态${currentMentality}，压力已减半）</p>
+                            <p>知识点效果系数: 0.0005 | 思维效果系数: 0.05 | 消耗 1 回合</p>
+                        </div>
                     `;
-                    document.getElementById('trainIntensity').addEventListener('input', (e) => {
+                    // 实时预览训练后的压力（减半）
+                    const intensityInput = document.getElementById('trainIntensity');
+                    intensityInput.addEventListener('input', (e) => {
                         document.getElementById('intensityValue').textContent = e.target.value;
+                        const z = parseInt(e.target.value);
+                        const newPressure = gameState.pressure + z * (20 - currentMentality) * 0.5;
+                        updatePressurePreview(newPressure);
                     });
+                    // 初始预览
+                    const initialZ = parseInt(intensityInput.value);
+                    const initialNewPressure = gameState.pressure + initialZ * (20 - currentMentality) * 0.5;
+                    updatePressurePreview(initialNewPressure);
                     break;
                 case 'practice':
                     title.textContent = '刷题';
-                    // content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+5<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+5<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    // 预览刷题后的压力
+                    updatePressurePreview(gameState.pressure + 5);
                     break;
                 case 'rest':
                     title.textContent = '摸鱼';
-                    // content.innerHTML = `<p class="text-center">压力 -${Math.ceil(gameState.talents.mentality * 3)}，心态 +2<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">压力 -${Math.ceil(gameState.talents.mentality * 3)}，心态 +2<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    // 预览摸鱼后的压力
+                    updatePressurePreview(gameState.pressure - gameState.talents.mentality * 3);
                     break;
                 case 'evil':
                     title.textContent = '邪修';
                     const failRate = Math.max(0, 100 - 3 * gameState.talents.thinking);
-                    content.innerHTML = `<p class="text-center"><span class="text-yellow-300">失效概率: ${failRate}% | 消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2<br><span class="text-yellow-300">失效概率: ${failRate}% | 消耗 1 回合</span></p>`;
+                    // 邪修不改变压力，预览当前压力
+                    updatePressurePreview(gameState.pressure);
                     break;
                 case 'research':
                     title.textContent = '钻研';
@@ -568,16 +662,67 @@
                                 <option value="counting">计数</option>
                             </select>
                         </div>
-                        // <p class="text-center mt-4">压力 +20，该知识点 +8<br><span class="text-yellow-300">消耗 1 回合</span></p>
+                        <p class="text-center mt-4">压力 +20，该知识点 +8<br><span class="text-yellow-300">消耗 1 回合</span></p>
                     `;
+                    // 预览钻研后的压力
+                    updatePressurePreview(gameState.pressure + 20);
                     break;
                 case 'exercise':
                     title.textContent = '实践';
-                    // content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">手速 +1，细心 +1，创造力 +2，压力 -8<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    // 预览实践后的压力
+                    updatePressurePreview(gameState.pressure - 8);
+                    break;
+                case 'help':
+                    title.textContent = '互助';
+                    content.innerHTML = `
+                        <div>
+                            <label class="block mb-2 font-medium">选择第一个知识点</label>
+                            <select id="helpKnowledge1" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <option value="numberTheory">数论</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="operation">操作</option>
+                                <option value="reasoning">推理</option>
+                                <option value="counting">计数</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-medium">选择第二个知识点</label>
+                            <select id="helpKnowledge2" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <option value="numberTheory">数论</option>
+                                <option value="algebra">代数</option>
+                                <option value="geometry">几何</option>
+                                <option value="operation">操作</option>
+                                <option value="reasoning">推理</option>
+                                <option value="counting">计数</option>
+                            </select>
+                        </div>
+                        <p class="text-center mt-4 text-yellow-300">两个知识点的值将变为它们的平均值 | 压力增加差值的一半 | 消耗 1 回合</p>
+                    `;
+                    // 实时预览互助后的压力（随选择的知识点变化）
+                    const help1Select = document.getElementById('helpKnowledge1');
+                    const help2Select = document.getElementById('helpKnowledge2');
+                    
+                    const updateHelpPressure = () => {
+                        const val1 = gameState.knowledge[help1Select.value] || 0;
+                        const val2 = gameState.knowledge[help2Select.value] || 0;
+                        const diff = Math.abs(val1 - val2);
+                        const pressureAdd = diff / 2;
+                        const newPressure = gameState.pressure + pressureAdd;
+                        updatePressurePreview(newPressure);
+                    };
+                    
+                    help1Select.addEventListener('change', updateHelpPressure);
+                    help2Select.addEventListener('change', updateHelpPressure);
+                    // 初始预览
+                    updateHelpPressure();
                     break;
                 case 'exam':
                     title.textContent = '考试';
-                    // content.innerHTML = `<p class="text-center">检验你的学习成果！<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">检验你的学习成果！<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    // 考试后压力变化：pressure = pressure * 1.2 + 20
+                    updatePressurePreview(gameState.pressure * 1.2 + 20);
                     break;
             }
 
@@ -599,13 +744,12 @@
                     const y = gameState.knowledge[knowledge]; // 当前知识点分值y
                     const mentality = gameState.talents.mentality; // 当前心态
                     
-                    // 严格按照新公式计算
-                    // 知识点y新值 = (100-abs(50-x))*z*(5+y/10)*k*0.0005 + y
+                    // 严格按照新公式计算，压力增加减半
                     const newY = (100 - Math.abs(50 - x)) * z * (5 + y / 10) * k * 0.0005 + y;
-                    // 思维k新值 = k + (50-abs(40-x-z*10))*0.05
                     const newK = k + (50 - Math.abs(40 - x - z * 10)) * 0.05;
-                    // 压力x新值 = x + z*(20-当前心态)*0.6
-                    const newX = x + z * (20 - mentality) * 0.6;
+                    // 压力增加量减半
+                    const pressureAdd = z * (20 - mentality) * 0.5;
+                    const newX = x + pressureAdd;
                     
                     // 更新数值
                     gameState.knowledge[knowledge] = newY;
@@ -615,12 +759,14 @@
                     // 所有数值向上取整并限制上限
                     ceilAllValues();
                     
-                    // 构建结果提示
+                    // 构建结果提示（包含压力等级）
+                    const trainPressureLevel = getPressureLevel(gameState.pressure);
                     result = `训练完成！<br>
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${Math.ceil(z * (20 - mentality) * 0.6)})<br>
-                             <span class="text-yellow-300">消耗 1 回合</span>`;
+                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${Math.ceil(pressureAdd)}，已减半) 
+                             <span class="pressure-level ${trainPressureLevel.class}">${trainPressureLevel.text}</span><br>
+                             <span class="text-yellow-300">知识点系数:0.0005 | 思维系数:0.05 | 消耗 1 回合</span>`;
                     break;
                 case 'practice':
                     const boost = gameState.talents.thinking / 100;
@@ -632,10 +778,13 @@
                     gameState.pressure += 5;
                     // 所有数值向上取整
                     ceilAllValues();
+                    // 压力等级
+                    const practicePressureLevel = getPressureLevel(gameState.pressure);
                     result = `刷题完成！<br>
                              所有知识点提升 ${Math.ceil(oldThinking)}%<br>
                              思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(gameState.pressure - 5)} → ${gameState.pressure}<br>
+                             压力: ${Math.ceil(gameState.pressure - 5)} → ${gameState.pressure} 
+                             <span class="pressure-level ${practicePressureLevel.class}">${practicePressureLevel.text}</span><br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'rest':
@@ -646,8 +795,11 @@
                     gameState.talents.mentality += 2;
                     // 所有数值向上取整
                     ceilAllValues();
+                    // 压力等级
+                    const restPressureLevel = getPressureLevel(gameState.pressure);
                     result = `摸鱼愉快！<br>
-                             压力: ${Math.ceil(oldPressure)} → ${gameState.pressure}<br>
+                             压力: ${Math.ceil(oldPressure)} → ${gameState.pressure} 
+                             <span class="pressure-level ${restPressureLevel.class}">${restPressureLevel.text}</span><br>
                              心态: ${Math.ceil(oldMentality)} → ${gameState.talents.mentality}<br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
@@ -655,11 +807,15 @@
                     // 邪修失效概率固定为 (100 - 3*思维)%
                     const failProbability = Math.max(0, 100 - 3 * gameState.talents.thinking);
                     const isFailed = Math.random() * 100 < failProbability;
+                    // 压力等级
+                    const evilPressureLevel = getPressureLevel(gameState.pressure);
                     
                     if (isFailed) {
                         result = `邪修失败！<br>
                                  本次邪修没有带来任何提升<br>
                                  失效概率: ${failProbability}%<br>
+                                 压力: ${Math.ceil(gameState.pressure)}/100 
+                                 <span class="pressure-level ${evilPressureLevel.class}">${evilPressureLevel.text}</span><br>
                                  <span class="text-yellow-300">消耗 1 回合</span>`;
                     } else {
                         const randomKnowledge = Object.keys(gameState.knowledge)[Math.floor(Math.random() * 6)];
@@ -677,6 +833,8 @@
                                  ${getKnowledgeName(randomKnowledge)}: ${Math.ceil(oldKnowledge)} → ${gameState.knowledge[randomKnowledge]}<br>
                                  思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
                                  创造力: ${Math.ceil(oldCreativity)} → ${gameState.talents.creativity}<br>
+                                 压力: ${Math.ceil(gameState.pressure)}/100 
+                                 <span class="pressure-level ${evilPressureLevel.class}">${evilPressureLevel.text}</span><br>
                                  <span class="text-yellow-300">消耗 1 回合</span>`;
                     }
                     break;
@@ -688,9 +846,12 @@
                     gameState.pressure += 20;
                     // 所有数值向上取整
                     ceilAllValues();
+                    // 压力等级
+                    const researchPressureLevel = getPressureLevel(gameState.pressure);
                     result = `钻研完成！<br>
                              ${getKnowledgeName(researchKnowledge)}: ${Math.ceil(oldResearchValue)} → ${gameState.knowledge[researchKnowledge]}<br>
-                             压力: ${Math.ceil(oldResearchPressure)} → ${gameState.pressure}<br>
+                             压力: ${Math.ceil(oldResearchPressure)} → ${gameState.pressure} 
+                             <span class="pressure-level ${researchPressureLevel.class}">${researchPressureLevel.text}</span><br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'exercise':
@@ -705,12 +866,49 @@
                     gameState.pressure -= 8;
                     // 所有数值向上取整
                     ceilAllValues();
-                    
+                    // 压力等级
+                    const exercisePressureLevel = getPressureLevel(gameState.pressure);
                     result = `实践完成！<br>
                              手速: ${Math.ceil(oldSpeed)} → ${gameState.talents.speed}<br>
                              细心: ${Math.ceil(oldCare)} → ${gameState.talents.carefulness}<br>
                              创造力: ${Math.ceil(oldCrea)} → ${gameState.talents.creativity}<br>
-                             压力: ${Math.ceil(oldExercisePressure)} → ${gameState.pressure}<br>
+                             压力: ${Math.ceil(oldExercisePressure)} → ${gameState.pressure} 
+                             <span class="pressure-level ${exercisePressureLevel.class}">${exercisePressureLevel.text}</span><br>
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
+                    break;
+                case 'help':
+                    const help1 = document.getElementById('helpKnowledge1').value;
+                    const help2 = document.getElementById('helpKnowledge2').value;
+                    
+                    // 不能选择同一个知识点
+                    if (help1 === help2) {
+                        alert('请选择两个不同的知识点！');
+                        return;
+                    }
+                    
+                    const val1 = gameState.knowledge[help1];
+                    const val2 = gameState.knowledge[help2];
+                    const diff = Math.abs(val1 - val2);
+                    const pressureAdd = diff / 2; // 压力增加差值的一半
+                    const average = (val1 + val2) / 2;
+                    
+                    // 更新为平均值
+                    gameState.knowledge[help1] = average;
+                    gameState.knowledge[help2] = average;
+                    // 增加压力
+                    gameState.pressure += pressureAdd;
+                    // 数值取整
+                    ceilAllValues();
+                    
+                    // 压力等级
+                    const helpPressureLevel = getPressureLevel(gameState.pressure);
+                    result = `互助完成！<br>
+                             ${getKnowledgeName(help1)}: ${Math.ceil(val1)} → ${gameState.knowledge[help1]}<br>
+                             ${getKnowledgeName(help2)}: ${Math.ceil(val2)} → ${gameState.knowledge[help2]}<br>
+                             平均值: ${Math.ceil(average)}<br>
+                             压力: ${Math.ceil(gameState.pressure - pressureAdd)} → ${gameState.pressure} 
+                             (增加${Math.ceil(pressureAdd)}，差值${Math.ceil(diff)}的一半)
+                             <span class="pressure-level ${helpPressureLevel.class}">${helpPressureLevel.text}</span><br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'exam':
@@ -759,9 +957,12 @@
                         // 所有数值向上取整
                         ceilAllValues();
                         
+                        // 压力等级
+                        const examPressureLevel = getPressureLevel(gameState.pressure);
                         content.innerHTML = `<p>提升完成！<br>
                                             ${getKnowledgeName(selected)}: ${Math.ceil(oldValue)} → ${gameState.knowledge[selected]}<br>
-                                            压力: ${Math.ceil((oldPressure * 1.2 + 20 - 20) / 1.2)} → ${gameState.pressure}<br>
+                                            压力: ${Math.ceil((oldPressure * 1.2 + 20 - 20) / 1.2)} → ${gameState.pressure} 
+                                            <span class="pressure-level ${examPressureLevel.class}">${examPressureLevel.text}</span><br>
                                             <span class="text-yellow-300">消耗 1 回合</span></p>`;
                         button.textContent = '继续';
                         button.onclick = closeResultModal;
@@ -777,7 +978,6 @@
             }
             
             closeActionModal();
-            // 移除此处的endRound调用，仅保留关闭结果弹窗时的单次调用
         }
 
         function showResult(message) {
@@ -800,7 +1000,7 @@
             
             // 检查压力是否过高
             if (gameState.pressure >= 100) {
-                alert('压力过大！游戏结束。');
+                alert('压力过大！游戏结束。重生失败...');
                 resetGame();
             }
         }
@@ -819,7 +1019,7 @@
 
         function resetGame() {
             document.getElementById('gameModal').classList.remove('active');
-            document.getElementById('startModal').classList.add('active');
+            document.getElementById('storyModal').classList.add('active'); // 重置后回到剧情页
             // 重置输入框
             document.getElementById('numberTheory').value = 5;
             document.getElementById('algebra').value = 5;
