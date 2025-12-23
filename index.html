@@ -604,7 +604,7 @@
                     // 思维k新值 = k + (50-abs(40-x-z*10))*0.05
                     const newK = k + (50 - Math.abs(40 - x - z * 10)) * 0.05;
                     // 压力x新值 = x + z*(20-当前心态)
-                    const newX = x + z * (20 - mentality);
+                    const newX = x + z * (20 - mentality)*0.3;
                     
                     // 更新数值
                     gameState.knowledge[knowledge] = newY;
