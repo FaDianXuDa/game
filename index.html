@@ -1,4 +1,295 @@
+
 <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马年元旦抽奖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "宋体", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .prize-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .prize-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f0f8ff;
+            min-width: 120px;
+            margin: 5px;
+        }
+
+        .prize-item .name {
+            font-weight: bold;
+            color: #e63946;
+            font-size: 18px;
+        }
+
+        .prize-item .count {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .roll-area {
+            height: 150px;
+            line-height: 150px;
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #2a9d8f;
+            border: 3px dashed #ccc;
+            border-radius: 10px;
+            margin: 30px 0;
+            background: #f9f9f9;
+        }
+
+        .btn-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #drawBtn {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #drawBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #drawBtn:hover:not(:disabled) {
+            background: #d62828;
+        }
+
+        .result-area {
+            margin-top: 20px;
+        }
+
+        .result-area h3 {
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .winner-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .winner-item {
+            padding: 8px 15px;
+            background: #e9f5e1;
+            border-radius: 20px;
+            color: #264653;
+            font-size: 14px;
+        }
+
+        .no-prize {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>班级抽奖系统</h1>
+
+        <!-- 奖项信息区 -->
+        <div class="prize-info">
+            <div class="prize-item">
+                <div class="name">特等奖：线条小狗/暖手宝</div>
+                <div class="count">剩余：<span id="specialCount">1</span> / 共1</div>
+            </div>
+            <div class="prize-item">
+                <div class="name">一等奖：笔盒+小汽车</div>
+                <div class="count">剩余：<span id="firstCount">3</span> / 共3</div>
+            </div>
+            <div class="prize-item">
+                <div class="name">二等奖：盒装中性笔</div>
+                <div class="count">剩余：<span id="secondCount">6</span> / 共6</div>
+            </div>
+            <div class="prize-item">
+                <div class="name">三等奖：健达（一条）By主持人</div>
+                <div class="count">剩余：<span id="thirdCount">10</span> / 共10</div>
+            </div>
+        </div>
+
+        <!-- 名字滚动区 -->
+        <div class="roll-area" id="rollArea">GoGoGo出发咯！</div>
+
+        <!-- 抽奖按钮 -->
+        <div class="btn-area">
+            <button id="drawBtn">GoGoGo出发咯！</button>
+        </div>
+
+        <!-- 中奖结果区 -->
+        <div class="result-area">
+            <h3>已中奖名单</h3>
+            <div class="winner-list" id="winnerList">
+                <div class="no-prize">没有任何中奖的高雅人士</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 初始化数据
+        // 39个同学名单（可自行修改名字）
+        const students = ["ZJK","YTZY","SHR","刘JH","HYT","WWS","WJR","XQY","GYE","WSF","LYT","L芷Y","ZZY","LYL","DHY","FBQ","LJZ","XYXY","SXY","LJX","ZMY","DYQ","LHM","DXK","YYX","LGN","WHS","HX","李JH","WJL","YXY","刘ZY","CER","章YM","LXY","HGX","曾YM","PYJ"];
+        // 已中奖的同学名单
+        let winners = [];
+        // 奖项配置
+        const prizeConfig = {
+            special: { count: 1, remain: 1, name: "特等奖：线条小狗/暖手宝" },
+            first: { count: 3, remain: 3, name: "一等奖：笔盒+小汽车" },
+            second: { count: 6, remain: 6, name: "二等奖：盒装中性笔" },
+            third: { count: 10, remain: 10, name: "三等奖：健达（一条）By主持人" }
+        };
+        // 滚动定时器
+        let rollTimer = null;
+        // 当前抽奖的奖项类型
+        let currentPrizeType = '';
+
+        // 2. 获取DOM元素
+        const rollArea = document.getElementById('rollArea');
+        const drawBtn = document.getElementById('drawBtn');
+        const winnerList = document.getElementById('winnerList');
+        const specialCount = document.getElementById('specialCount');
+        const firstCount = document.getElementById('firstCount');
+        const secondCount = document.getElementById('secondCount');
+        const thirdCount = document.getElementById('thirdCount');
+
+        // 3. 确定当前该抽哪个奖项
+        function getCurrentPrizeType() {
+            if (prizeConfig.special.remain > 0) return 'special';
+            if (prizeConfig.first.remain > 0) return 'first';
+            if (prizeConfig.second.remain > 0) return 'second';
+            if (prizeConfig.third.remain > 0) return 'third';
+            return ''; // 所有奖项抽完
+        }
+
+        // 4. 滚动名字函数
+        function rollName() {
+            // 过滤掉已中奖的同学，得到可抽奖的名单
+            const availableStudents = students.filter(s => !winners.includes(s));
+            if (availableStudents.length === 0) return '';
+            // 随机选一个名字
+            const randomIndex = Math.floor(Math.random() * availableStudents.length);
+            return availableStudents[randomIndex];
+        }
+
+        // 5. 更新奖项剩余数量显示
+        function updatePrizeCount() {
+            specialCount.textContent = prizeConfig.special.remain;
+            firstCount.textContent = prizeConfig.first.remain;
+            secondCount.textContent = prizeConfig.second.remain;
+            thirdCount.textContent = prizeConfig.third.remain;
+        }
+
+        // 6. 更新中奖名单显示
+        function updateWinnerList() {
+            if (winners.length === 0) {
+                winnerList.innerHTML = '<div class="no-prize">没有任何中奖的高雅人士</div>';
+                return;
+            }
+            // 生成中奖名单HTML
+            let winnerHtml = '';
+            winners.forEach(winner => {
+                winnerHtml += `<div class="winner-item">${winner.name}（${winner.prize}）</div>`;
+            });
+            winnerList.innerHTML = winnerHtml;
+        }
+
+        // 7. 抽奖核心逻辑
+        drawBtn.addEventListener('click', function() {
+            // 判断是否所有奖项都抽完
+            currentPrizeType = getCurrentPrizeType();
+            if (!currentPrizeType) {
+                rollArea.textContent = '看什么看？没了！';
+                drawBtn.disabled = true;
+                return;
+            }
+
+            // 按钮状态切换：开始/停止
+            if (this.textContent === 'GoGoGo出发咯！') {
+                // 开始滚动名字
+                this.textContent = 'NoNoNo被肘咯。';
+                rollArea.style.color = '#e63946';
+                // 每隔50毫秒更新一次名字
+                rollTimer = setInterval(() => {
+                    rollArea.textContent = rollName();
+                }, 50);
+            } else {
+                // 停止滚动，确定中奖者
+                clearInterval(rollTimer);
+                this.textContent = 'GoGoGo出发咯！';
+                rollArea.style.color = '#2a9d8f';
+                
+                // 获取中奖者名字
+                const winnerName = rollArea.textContent;
+                // 记录中奖信息
+                winners.push({
+                    name: winnerName,
+                    prize: prizeConfig[currentPrizeType].name
+                });
+                
+                // 减少对应奖项剩余数量
+                prizeConfig[currentPrizeType].remain--;
+                
+                // 更新界面显示
+                updatePrizeCount();
+                updateWinnerList();
+                
+                // 提示中奖信息
+                setTimeout(() => {
+                    alert(`恭喜${winnerName}获得${prizeConfig[currentPrizeType].name}！`);
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
+
+/* <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1059,3 +1350,4 @@
     </script>
 </body>
 </html>
+ */
