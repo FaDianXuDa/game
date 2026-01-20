@@ -759,8 +759,8 @@
                     const newY = (100 - Math.abs(50 - x)) * z * (5 + y / 10) * k * 0.0005 + y;
                     const newK = k + (50 - Math.abs(40 - x - z * 10)) * 0.05;
                     // 压力增加量减半
-                    const pressureAdd = z * (20 - mentality) * 0.5;
-                    const newX = x + pressureAdd;
+                    const pressure_Add = z * (20 - mentality) * 0.5;
+                    const newX = x + pressure_Add;
                     
                     // 更新数值
                     gameState.knowledge[knowledge] = newY;
@@ -775,7 +775,7 @@
                     result = `训练完成！<br>
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${Math.ceil(pressureAdd)}，已减半) 
+                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${Math.ceil(pressure_Add)}，已减半) 
                              <span class="pressure-level ${trainPressureLevel.class}">${trainPressureLevel.text}</span><br>
                              <span class="text-yellow-300">知识点系数:0.0005 | 思维系数:0.05 | 消耗 1 回合</span>`;
                     break;
