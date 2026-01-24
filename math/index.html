@@ -1,5 +1,6 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,36 +9,40 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
         }
+
         .glass {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.18);
         }
+
         .btn {
             transition: all 0.3s ease;
-            cursor: pointer; /* 新增：确保按钮有鼠标指针 */
         }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+
         .stat-bar {
             height: 20px;
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.3);
             overflow: hidden;
         }
+
         .stat-fill {
             height: 100%;
             transition: width 0.5s ease;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -48,30 +53,53 @@
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
             z-index: 1000;
-            align-items: center; /* 新增：确保flex布局生效 */
-            justify-content: center; /* 新增：确保flex布局生效 */
         }
+
         .modal.active {
             display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         /* 压力等级样式 */
         .pressure-level {
             padding: 4px 8px;
             border-radius: 4px;
             font-weight: 600;
         }
-        .level-light { background-color: #10b981; color: white; } /* 轻度-绿色 */
-        .level-moderate { background-color: #f59e0b; color: white; } /* 中度-黄色 */
-        .level-severe { background-color: #f97316; color: white; } /* 重度-橙色 */
-        .level-critical { background-color: #ef4444; color: white; } /* 超重度-红色 */
+
+        .level-light {
+            background-color: #10b981;
+            color: white;
+        }
+
+        /* 轻度-绿色 */
+        .level-moderate {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        /* 中度-黄色 */
+        .level-severe {
+            background-color: #f97316;
+            color: white;
+        }
+
+        /* 重度-橙色 */
+        .level-critical {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* 超重度-红色 */
         /* 剧情弹窗样式 */
         .story-modal {
             background: rgba(15, 23, 42, 0.95);
             border: 2px solid #8b5cf6;
-            z-index: 2000; /* 提高层级，确保在最上层 */
         }
     </style>
 </head>
+
 <body class="text-white">
     <!-- 新增剧情弹窗 -->
     <div id="storyModal" class="modal active story-modal">
@@ -81,8 +109,8 @@
                 巨浪同志的树穴老邓被滚回了精神病院，导致了巨浪的初中树穴牢尸不见了，需要长达一坤年的自学。<br>
                 而被肘死的巨浪同志也是成功重生了。这一世，他要夺回属于他的一切！
             </p>
-            <!-- 修复：按钮添加id，确保事件绑定生效 -->
-            <button id="storyCloseBtn" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-lg btn">
+            <button onclick="closeStoryModal()"
+                class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 font-bold text-lg btn">
                 开始我的重生之路
             </button>
         </div>
@@ -98,49 +126,67 @@
                         <div class="flex items-center justify-between">
                             <label for="numberTheory" class="font-medium">数论</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('numberTheory', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="numberTheory" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('numberTheory', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('numberTheory', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="numberTheory" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('numberTheory', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="algebra" class="font-medium">代数</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('algebra', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="algebra" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('algebra', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('algebra', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="algebra" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('algebra', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="geometry" class="font-medium">几何</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('geometry', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="geometry" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('geometry', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('geometry', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="geometry" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('geometry', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="operation" class="font-medium">操作</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('operation', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="operation" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('operation', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('operation', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="operation" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('operation', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="reasoning" class="font-medium">推理</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('reasoning', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="reasoning" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('reasoning', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('reasoning', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="reasoning" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('reasoning', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="counting" class="font-medium">计数</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustKnowledge('counting', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="counting" value="5" min="0" max="30" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustKnowledge('counting', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustKnowledge('counting', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="counting" value="5" min="0" max="30"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustKnowledge('counting', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                     </div>
@@ -152,48 +198,64 @@
                         <div class="flex items-center justify-between">
                             <label for="carefulness" class="font-medium">细心</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustTalent('carefulness', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="carefulness" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustTalent('carefulness', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustTalent('carefulness', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="carefulness" value="3" min="0" max="15"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('carefulness', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="mentality" class="font-medium">心态</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustTalent('mentality', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="mentality" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustTalent('mentality', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustTalent('mentality', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="mentality" value="3" min="0" max="15"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('mentality', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="speed" class="font-medium">手速</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustTalent('speed', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="speed" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustTalent('speed', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustTalent('speed', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="speed" value="3" min="0" max="15"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('speed', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="creativity" class="font-medium">创造力</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustTalent('creativity', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="creativity" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustTalent('creativity', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustTalent('creativity', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="creativity" value="3" min="0" max="15"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('creativity', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <label for="thinking" class="font-medium">思维</label>
                             <div class="flex items-center gap-2">
-                                <button onclick="adjustTalent('thinking', -1)" class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
-                                <input type="number" id="thinking" value="3" min="0" max="15" class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
-                                <button onclick="adjustTalent('thinking', 1)" class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
+                                <button onclick="adjustTalent('thinking', -1)"
+                                    class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">-</button>
+                                <input type="number" id="thinking" value="3" min="0" max="15"
+                                    class="w-12 text-center rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                                <button onclick="adjustTalent('thinking', 1)"
+                                    class="w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center">+</button>
                             </div>
                         </div>
                     </div>
                     <p class="text-center mt-4" id="talentTotal">剩余: 0</p>
                 </div>
             </div>
-            <button onclick="startGame()" class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-lg btn">开始游戏</button>
+            <button onclick="startGame()"
+                class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-lg btn">开始游戏</button>
         </div>
     </div>
 
@@ -329,44 +391,52 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-grow overflow-y-auto">
-                <button onclick="showActionModal('train')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('train')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="book-open" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">训练</h3>
                     <p class="text-sm text-center mt-2">选择一个知识点进行针对性训练</p>
                 </button>
-                <button onclick="showActionModal('practice')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('practice')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="pen-tool" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">刷题</h3>
                     <p class="text-sm text-center mt-2">全面提升所有知识点</p>
                 </button>
-                <button onclick="showActionModal('rest')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('rest')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="coffee" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">摸鱼</h3>
                     <p class="text-sm text-center mt-2">缓解压力，提升心态</p>
                 </button>
-                <button onclick="showActionModal('evil')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('evil')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="zap" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">邪修</h3>
                     <p class="text-sm text-center mt-2">快速提升能力，但有风险</p>
                 </button>
-                <button onclick="showActionModal('research')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('research')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="flask-conical" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">钻研</h3>
                     <p class="text-sm text-center mt-2">深入研究一个知识点</p>
                 </button>
-                <button onclick="showActionModal('exercise')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('exercise')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="dumbbell" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">实践</h3>
                     <p class="text-sm text-center mt-2">提升多项天赋，缓解压力</p>
                 </button>
-                <button onclick="showActionModal('help')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
+                <button onclick="showActionModal('help')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn">
                     <i data-lucide="users" class="w-12 h-12 mb-4"></i>
                     <h3 class="text-xl font-bold">互助</h3>
                     <p class="text-sm text-center mt-2">两个知识点取平均值（压力随差值增加）</p>
                 </button>
-                <button onclick="showActionModal('exam')" class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-4">
+                <button onclick="showActionModal('exam')"
+                    class="glass rounded-xl p-6 flex flex-col items-center justify-center h-full btn col-span-1 md:col-span-2 lg:col-span-4">
                     <i data-lucide="graduation-cap" class="w-12 h-12 mb-4"></i>
-                    <h3 class="text-xl font-bold">考试</h3>
+                    <h3 class="text-xl font-bold">小测</h3>
                     <p class="text-sm text-center mt-2">检验你的学习成果</p>
                 </button>
             </div>
@@ -388,8 +458,10 @@
                 </div>
             </div>
             <div class="flex gap-4 mt-8">
-                <button onclick="closeActionModal()" class="flex-1 py-3 rounded-xl bg-gray-500 hover:bg-gray-600 font-bold btn">取消</button>
-                <button id="confirmAction" onclick="confirmAction()" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">确认</button>
+                <button onclick="closeActionModal()"
+                    class="flex-1 py-3 rounded-xl bg-gray-500 hover:bg-gray-600 font-bold btn">取消</button>
+                <button id="confirmAction" onclick="confirmAction()"
+                    class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">确认</button>
             </div>
         </div>
     </div>
@@ -400,7 +472,8 @@
             <div id="resultContent" class="space-y-4">
                 <!-- 动态内容 -->
             </div>
-            <button onclick="closeResultModal()" class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">继续</button>
+            <button onclick="closeResultModal()"
+                class="w-full mt-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold btn">继续</button>
         </div>
     </div>
 
@@ -430,12 +503,6 @@
 
         let knowledgePointsRemaining = 30;
         let talentPointsRemaining = 15;
-
-        // 修复：使用DOMContentLoaded确保元素加载完成后绑定事件
-        document.addEventListener('DOMContentLoaded', function() {
-            // 绑定剧情弹窗关闭按钮事件
-            document.getElementById('storyCloseBtn').addEventListener('click', closeStoryModal);
-        });
 
         // 关闭剧情弹窗
         function closeStoryModal() {
@@ -476,12 +543,12 @@
             const previewContainer = document.getElementById('pressurePreview');
             const previewValue = document.getElementById('previewPressureValue');
             const previewLevel = document.getElementById('previewPressureLevel');
-            
+
             const levelInfo = getPressureLevel(newPressure);
             previewValue.textContent = `${Math.ceil(newPressure)}/100`;
             previewLevel.textContent = levelInfo.text;
             previewLevel.className = `pressure-level ${levelInfo.class}`;
-            
+
             previewContainer.classList.remove('hidden');
         }
 
@@ -623,8 +690,7 @@
                             </div>
                         </div>
                         <div class="mt-4 text-center text-yellow-300">
-                            <p>压力增加量: 强度 × (20 - 当前心态) × 0.5（当前心态${currentMentality}，压力已减半）</p>
-                            <p>知识点效果系数: 0.0005 | 思维效果系数: 0.05 | 消耗 1 回合</p>
+                            <p>消耗 1 回合</p>
                         </div>
                     `;
                     // 实时预览训练后的压力（减半）
@@ -642,9 +708,9 @@
                     break;
                 case 'practice':
                     title.textContent = '刷题';
-                    content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+5<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">所有知识点提升 ${Math.ceil(gameState.talents.thinking)}%，思维+1，压力+15<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
                     // 预览刷题后的压力
-                    updatePressurePreview(gameState.pressure + 5);
+                    updatePressurePreview(gameState.pressure + 15);
                     break;
                 case 'rest':
                     title.textContent = '摸鱼';
@@ -655,7 +721,7 @@
                 case 'evil':
                     title.textContent = '邪修';
                     const failRate = Math.max(0, 100 - 3 * gameState.talents.thinking);
-                    content.innerHTML = `<p class="text-center">思维 +5，随机知识点 +7，创造力 +2<br><span class="text-yellow-300">失效概率: ${failRate}% | 消耗 1 回合</span></p>`;
+                    content.innerHTML = `<p class="text-center">压力 +10，思维 +3，随机知识点 +7，创造力 +1<br><span class="text-yellow-300">失效概率: ${failRate}% | 消耗 1 回合</span></p>`;
                     // 邪修不改变压力，预览当前压力
                     updatePressurePreview(gameState.pressure);
                     break;
@@ -689,7 +755,7 @@
                     content.innerHTML = `
                         <div>
                             <label class="block mb-2 font-medium">选择第一个知识点</label>
-                            <select id="helpKnowledge1" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                            <select id="helpKnowledge1" class="w-full p-2 rounded bg-black/20 border-none focus:ring-2 focus:ring-blue-400">
                                 <option value="numberTheory">数论</option>
                                 <option value="algebra">代数</option>
                                 <option value="geometry">几何</option>
@@ -700,7 +766,7 @@
                         </div>
                         <div>
                             <label class="block mb-2 font-medium">选择第二个知识点</label>
-                            <select id="helpKnowledge2" class="w-full p-2 rounded bg-white/20 border-none focus:ring-2 focus:ring-blue-400">
+                            <select id="helpKnowledge2" class="w-full p-2 rounded bg-black/20 border-none focus:ring-2 focus:ring-blue-400">
                                 <option value="numberTheory">数论</option>
                                 <option value="algebra">代数</option>
                                 <option value="geometry">几何</option>
@@ -714,7 +780,7 @@
                     // 实时预览互助后的压力（随选择的知识点变化）
                     const help1Select = document.getElementById('helpKnowledge1');
                     const help2Select = document.getElementById('helpKnowledge2');
-                    
+
                     const updateHelpPressure = () => {
                         const val1 = gameState.knowledge[help1Select.value] || 0;
                         const val2 = gameState.knowledge[help2Select.value] || 0;
@@ -723,16 +789,16 @@
                         const newPressure = gameState.pressure + pressureAdd;
                         updatePressurePreview(newPressure);
                     };
-                    
+
                     help1Select.addEventListener('change', updateHelpPressure);
                     help2Select.addEventListener('change', updateHelpPressure);
                     // 初始预览
                     updateHelpPressure();
                     break;
                 case 'exam':
-                    title.textContent = '考试';
+                    title.textContent = '小测';
                     content.innerHTML = `<p class="text-center">检验你的学习成果！<br><span class="text-yellow-300">消耗 1 回合</span></p>`;
-                    // 考试后压力变化：pressure = pressure * 1.2 + 20
+                    // 小测后压力变化：pressure = pressure * 1.2 + 20
                     updatePressurePreview(gameState.pressure * 1.2 + 20);
                     break;
             }
@@ -754,30 +820,30 @@
                     const k = gameState.talents.thinking; // 当前思维k
                     const y = gameState.knowledge[knowledge]; // 当前知识点分值y
                     const mentality = gameState.talents.mentality; // 当前心态
-                    
+
                     // 严格按照新公式计算，压力增加减半
                     const newY = (100 - Math.abs(50 - x)) * z * (5 + y / 10) * k * 0.0005 + y;
                     const newK = k + (50 - Math.abs(40 - x - z * 10)) * 0.05;
                     // 压力增加量减半
-                    const pressure_Add = z * (20 - mentality) * 0.5;
-                    const newX = x + pressure_Add;
-                    
+                    const pressurreAdd = z * (20 - mentality) * 0.5;
+                    const newX = x + pressurreAdd;
+
                     // 更新数值
                     gameState.knowledge[knowledge] = newY;
                     gameState.talents.thinking = newK;
                     gameState.pressure = newX;
-                    
+
                     // 所有数值向上取整并限制上限
                     ceilAllValues();
-                    
+
                     // 构建结果提示（包含压力等级）
                     const trainPressureLevel = getPressureLevel(gameState.pressure);
                     result = `训练完成！<br>
                              ${getKnowledgeName(knowledge)}: ${Math.ceil(y)} → ${gameState.knowledge[knowledge]}<br>
                              思维: ${Math.ceil(k)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(x)} → ${gameState.pressure} (增加${Math.ceil(pressure_Add)}，已减半) 
+                             压力: ${Math.ceil(x)} → ${gameState.pressure} 
                              <span class="pressure-level ${trainPressureLevel.class}">${trainPressureLevel.text}</span><br>
-                             <span class="text-yellow-300">知识点系数:0.0005 | 思维系数:0.05 | 消耗 1 回合</span>`;
+                             <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
                 case 'practice':
                     const boost = gameState.talents.thinking / 100;
@@ -786,7 +852,7 @@
                         gameState.knowledge[key] = gameState.knowledge[key] * (1 + boost);
                     });
                     gameState.talents.thinking += 1;
-                    gameState.pressure += 5;
+                    gameState.pressure += 15;
                     // 所有数值向上取整
                     ceilAllValues();
                     // 压力等级
@@ -794,7 +860,7 @@
                     result = `刷题完成！<br>
                              所有知识点提升 ${Math.ceil(oldThinking)}%<br>
                              思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
-                             压力: ${Math.ceil(gameState.pressure - 5)} → ${gameState.pressure} 
+                             压力: ${Math.ceil(gameState.pressure - 15)} → ${gameState.pressure} 
                              <span class="pressure-level ${practicePressureLevel.class}">${practicePressureLevel.text}</span><br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
                     break;
@@ -819,13 +885,14 @@
                     const failProbability = Math.max(0, 100 - 3 * gameState.talents.thinking);
                     const isFailed = Math.random() * 100 < failProbability;
                     // 压力等级
+                    const pyj = gameState.pressure;
+                    gameState.pressure += 10;
                     const evilPressureLevel = getPressureLevel(gameState.pressure);
-                    
                     if (isFailed) {
                         result = `邪修失败！<br>
                                  本次邪修没有带来任何提升<br>
                                  失效概率: ${failProbability}%<br>
-                                 压力: ${Math.ceil(gameState.pressure)}/100 
+                                 压力: ${Math.ceil(pyj)} → ${gameState.pressure} 
                                  <span class="pressure-level ${evilPressureLevel.class}">${evilPressureLevel.text}</span><br>
                                  <span class="text-yellow-300">消耗 1 回合</span>`;
                     } else {
@@ -833,18 +900,18 @@
                         const oldKnowledge = gameState.knowledge[randomKnowledge];
                         const oldThinking = gameState.talents.thinking;
                         const oldCreativity = gameState.talents.creativity;
-                        
+
                         gameState.knowledge[randomKnowledge] += 7;
-                        gameState.talents.thinking += 5;
-                        gameState.talents.creativity += 2;
+                        gameState.talents.thinking += 3;
+                        gameState.talents.creativity += 1;
                         // 所有数值向上取整
                         ceilAllValues();
-                        
+
                         result = `邪修成功！<br>
                                  ${getKnowledgeName(randomKnowledge)}: ${Math.ceil(oldKnowledge)} → ${gameState.knowledge[randomKnowledge]}<br>
                                  思维: ${Math.ceil(oldThinking)} → ${gameState.talents.thinking}<br>
                                  创造力: ${Math.ceil(oldCreativity)} → ${gameState.talents.creativity}<br>
-                                 压力: ${Math.ceil(gameState.pressure)}/100 
+                                 压力: ${Math.ceil(pyj)} → ${gameState.pressure} 
                                  <span class="pressure-level ${evilPressureLevel.class}">${evilPressureLevel.text}</span><br>
                                  <span class="text-yellow-300">消耗 1 回合</span>`;
                     }
@@ -870,7 +937,7 @@
                     const oldSpeed = gameState.talents.speed;
                     const oldCare = gameState.talents.carefulness;
                     const oldCrea = gameState.talents.creativity;
-                    
+
                     gameState.talents.speed += 1;
                     gameState.talents.carefulness += 1;
                     gameState.talents.creativity += 2;
@@ -890,19 +957,19 @@
                 case 'help':
                     const help1 = document.getElementById('helpKnowledge1').value;
                     const help2 = document.getElementById('helpKnowledge2').value;
-                    
+
                     // 不能选择同一个知识点
                     if (help1 === help2) {
                         alert('请选择两个不同的知识点！');
                         return;
                     }
-                    
+
                     const val1 = gameState.knowledge[help1];
                     const val2 = gameState.knowledge[help2];
                     const diff = Math.abs(val1 - val2);
                     const pressureAdd = diff / 2; // 压力增加差值的一半
                     const average = (val1 + val2) / 2;
-                    
+
                     // 更新为平均值
                     gameState.knowledge[help1] = average;
                     gameState.knowledge[help2] = average;
@@ -910,7 +977,7 @@
                     gameState.pressure += pressureAdd;
                     // 数值取整
                     ceilAllValues();
-                    
+
                     // 压力等级
                     const helpPressureLevel = getPressureLevel(gameState.pressure);
                     result = `互助完成！<br>
@@ -934,14 +1001,14 @@
                     }
                     weights.push(20 - total);
                     const [a, b, c, d, e, f] = weights;
-                    
-                    result = `考试完成！<br><br>
+
+                    result = `小测完成！<br><br>
                              知识点权重：<br>
                              数论: ${a} | 代数: ${b} | 几何: ${c}<br>
                              操作: ${d} | 推理: ${e} | 计数: ${f}<br><br>
                              选择一个知识点提升 20%<br>
                              <span class="text-yellow-300">消耗 1 回合</span>`;
-                    
+
                     // 显示选择界面
                     const modal = document.getElementById('resultModal');
                     const content = document.getElementById('resultContent');
@@ -962,12 +1029,12 @@
                         const selected = document.getElementById('boostKnowledge').value;
                         const oldValue = gameState.knowledge[selected];
                         const oldPressure = gameState.pressure;
-                        
+
                         gameState.knowledge[selected] *= 1.2;
                         gameState.pressure = gameState.pressure * 1.2 + 20;
                         // 所有数值向上取整
                         ceilAllValues();
-                        
+
                         // 压力等级
                         const examPressureLevel = getPressureLevel(gameState.pressure);
                         content.innerHTML = `<p>提升完成！<br>
@@ -983,11 +1050,11 @@
                     break;
             }
 
-            // 非考试操作直接显示结果
+            // 非小测操作直接显示结果
             if (gameState.currentAction !== 'exam') {
                 showResult(result);
             }
-            
+
             closeActionModal();
         }
 
@@ -1008,7 +1075,7 @@
         function endRound() {
             gameState.round++;
             updateDisplay();
-            
+
             // 检查压力是否过高
             if (gameState.pressure >= 100) {
                 alert('压力过大！游戏结束。重生失败...');
@@ -1044,7 +1111,7 @@
             document.getElementById('creativity').value = 3;
             document.getElementById('thinking').value = 3;
             updatePointCounters();
-            
+
             gameState = {
                 knowledge: { numberTheory: 0, algebra: 0, geometry: 0, operation: 0, reasoning: 0, counting: 0 },
                 talents: { carefulness: 0, mentality: 0, speed: 0, creativity: 0, thinking: 0 },
@@ -1058,5 +1125,5 @@
         updatePointCounters();
     </script>
 </body>
-</html>
 
+</html>
